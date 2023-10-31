@@ -2,6 +2,7 @@ package com.example.ex1101;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -16,9 +17,12 @@ import android.widget.TextView;
  * Saves the data when the user exits the app, and loads it again when the app runs.
  */
 public class MainActivity extends AppCompatActivity {
+    String text;
     int counter;
     TextView counterTv;
     EditText eT;
+    SharedPreferences savedData;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +32,13 @@ public class MainActivity extends AppCompatActivity {
         counterTv = (TextView) findViewById(R.id.counterTv);
         eT = (EditText) findViewById(R.id.eT);
 
-        counter = 0;
+        savedData = (SharedPreferences) getSharedPreferences("PREFS_DATA", MODE_PRIVATE);
+        editor = savedData.edit();
+
+        // Reads from the file the saved values and displays them
+        text = savedData.getString("userText", "");
+        eT.setText(text);
+        counter = savedData.getInt("counterValue", 0);
         counterTv.setText("" + counter);
     }
 
@@ -55,6 +65,20 @@ public class MainActivity extends AppCompatActivity {
         counterTv.setText("" + counter);
     }
 
+    /**
+     * This function saves the text data and the counter value to the shared preferences file and
+     * exits the app.
+     * <p>
+     *
+     * @param view The button clicked to save and exit the app.
+     */
     public void exit(View view) {
+        text = eT.getText().toString();
+
+        editor.putString("userText", text);
+        editor.putInt("counterValue", counter);
+        editor.commit();
+
+        finish();
     }
 }
